@@ -83,23 +83,6 @@ jobs:
         with:
           node-version: "18"
 
-      #Generate Meta
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ needs.meta.outputs.container_base }}
-          labels: ${{ needs.meta.outputs.container_labels }}
-          build-args: |
-            BUILDTIME=${{ needs.meta.outputs.container_buildtime }}
-            VERSION=${{ needs.meta.outputs.container_version }}
-            REVISION=${{ needs.meta.outputs.container_revision }}
-            logscale_version=${{ matrix.lsversion }}
-          cache-from: type=registry,ref=${{ needs.meta.outputs.container_base }}
-          cache-to: type=inline
-
       - name: Docker meta
         id: docker_action_meta
         uses: docker/metadata-action@v4.1.1
@@ -118,6 +101,24 @@ jobs:
             type=ref,event=tag
           labels: |
             org.opencontainers.image.licenses=Apache-2.0
+
+      #Generate Meta
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker_action_meta.outputs.tags }}
+          labels: ${{ steps.docker_action_meta.outputs.labels }}
+          build-args: |
+            BUILDTIME=${{ ${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.created'] }} }}
+            VERSION=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+            logscale_version=${{ matrix.lsversion }}
+          cache-from: type=registry,ref=${{ fromJSON(steps.docker_action_meta.outputs.json).tags[0] }}
+          cache-to: type=inline
+
 
       - name: Semantic Release
         if: github.event_name != 'pull_request'
