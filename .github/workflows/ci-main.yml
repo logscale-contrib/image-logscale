@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version:
+        lsversion:
           - 1.63.1
           # - 1.63.2
           # - 1.63.3
@@ -96,7 +96,7 @@ jobs:
             BUILDTIME=${{ needs.meta.outputs.container_buildtime }}
             VERSION=${{ needs.meta.outputs.container_version }}
             REVISION=${{ needs.meta.outputs.container_revision }}
-            logscale_version=${{ matrix.version }}
+            logscale_version=${{ matrix.lsversion }}
           cache-from: type=registry,ref=${{ needs.meta.outputs.container_base }}
           cache-to: type=inline
 
