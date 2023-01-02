@@ -121,7 +121,7 @@ jobs:
 
       - name: Semantic Release
         if: github.event_name != 'pull_request'
-        id: version
+        id: release_version
         uses: cycjimmy/semantic-release-action@v3.2.0
         with:
           semantic_version: 19
