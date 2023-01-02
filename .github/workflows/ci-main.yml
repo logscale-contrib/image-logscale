@@ -94,8 +94,6 @@ jobs:
             type=sha,format=long
             type=sha
             type=semver,pattern={{version}},value=${{ steps.version.outputs.new_release_version }},prefix=${{ matrix.lsversion }}-
-            type=semver,pattern={{major}},value=${{ steps.version.outputs.new_release_version }},prefix=${{ matrix.lsversion }}-
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.new_release_version }},prefix=${{ matrix.lsversion }}-
             type=ref,event=branch,prefix=${{ matrix.lsversion }}-
             type=ref,event=pr,prefix=${{ matrix.lsversion }}-
             type=ref,event=tag,prefix=${{ matrix.lsversion }}-
