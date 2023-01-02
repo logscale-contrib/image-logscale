@@ -1,0 +1,72 @@
+#
+name: Manual CD
+#
+on:
+  workflow_dispatch:
+    inputs:
+      lsversion:
+        description: "Logscale Version"
+        required: true
+      baseversion:
+        description: "Base artifacts"
+        required: true
+jobs:
+  Containerize:
+    runs-on: ubuntu-latest
+
+    steps:
+      #Yes we need code
+      - uses: actions/checkout@v3
+        with:
+          submodules: false
+          persist-credentials: false
+      # These steps are quick and will work or if fail only because of external issues
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2.1.0
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+     
+      - name: Docker meta
+        id: docker_action_meta
+        uses: docker/metadata-action@v4.1.1
+        with:
+          images: ghcr.io/${{ github.repository }}/container
+          flavor: |
+            latest=false
+          tags: |
+            type=sha,format=long
+            type=sha
+            type=semver,pattern={{version}},value=${{ github.event.inputs.baseversion }},prefix=${{ github.event.inputs.lsversion }}-
+            type=semver,pattern={{major}},value=${{ github.event.inputs.baseversion }},prefix=${{ github.event.inputs.lsversion }}-
+            type=semver,pattern={{major}}.{{minor}},value=${{ github.event.inputs.baseversion }},prefix=${{ github.event.inputs.lsversion }}-
+            type=ref,event=branch,prefix=${{ github.event.inputs.lsversion }}-
+            type=ref,event=pr,prefix=${{ github.event.inputs.lsversion }}-
+            type=ref,event=tag,prefix=${{ github.event.inputs.lsversion }}-
+          labels: |
+            org.opencontainers.image.licenses=Apache-2.0
+
+      #Generate Meta
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.docker_action_meta.outputs.tags }}
+          labels: ${{ steps.docker_action_meta.outputs.labels }}
+          build-args: |
+            BUILDTIME=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            VERSION=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+            logscale_version=${{ github.event.inputs.lsversion }}
+          cache-from: type=registry,ref=${{ fromJSON(steps.docker_action_meta.outputs.json).tags[0] }}
+          cache-to: type=inline
+
