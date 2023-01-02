@@ -112,13 +112,12 @@ jobs:
           tags: ${{ steps.docker_action_meta.outputs.tags }}
           labels: ${{ steps.docker_action_meta.outputs.labels }}
           build-args: |
-            BUILDTIME=${{ ${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.created'] }} }}
+            BUILDTIME=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.docker_action_meta.outputs.json).labels['org.opencontainers.image.revision'] }}
             logscale_version=${{ matrix.lsversion }}
           cache-from: type=registry,ref=${{ fromJSON(steps.docker_action_meta.outputs.json).tags[0] }}
           cache-to: type=inline
-
 
       - name: Semantic Release
         if: github.event_name != 'pull_request'
