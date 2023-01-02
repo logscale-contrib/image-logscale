@@ -8,10 +8,13 @@ FROM ghcr.io/logscale-contrib/image-logscale-azul-19-base/container:1.0.1
 #
 ARG logscale_user=humio
 
-RUN mkdir -p /data/humio-data /data/logs /backup
+RUN mkdir -p /data/humio-data /data/logs /backup ;\
+    chown -R nobody:nobody /data ;\
+    chown -R nobody:nobody /backup
 
 COPY --from=binaries /app /app
 
 WORKDIR /app/humio
 EXPOSE 8080
+USER nobody
 CMD ["/bin/sh","/app/humio/run.sh"]
