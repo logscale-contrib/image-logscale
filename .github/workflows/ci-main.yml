@@ -93,12 +93,12 @@ jobs:
           tags: |
             type=sha,format=long
             type=sha
-            type=semver,pattern={{version}},value=${{ steps.version.outputs.new_release_version }}
-            type=semver,pattern={{major}},value=${{ steps.version.outputs.new_release_version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.new_release_version }}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=ref,event=tag
+            type=semver,pattern={{version}},value=${{ steps.version.outputs.new_release_version }},prefix=-${matrix.lsversion}
+            type=semver,pattern={{major}},value=${{ steps.version.outputs.new_release_version }},prefix=-${matrix.lsversion}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.new_release_version }},prefix=-${matrix.lsversion}
+            type=ref,event=branch,prefix=-${matrix.lsversion}
+            type=ref,event=pr,prefix=-${matrix.lsversion}
+            type=ref,event=tag,prefix=-${matrix.lsversion}
           labels: |
             org.opencontainers.image.licenses=Apache-2.0
 
