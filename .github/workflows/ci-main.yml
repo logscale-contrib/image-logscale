@@ -46,7 +46,7 @@ jobs:
           - 1.67.0
     steps:
       #Yes we need code
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: false
           persist-credentials: false
