@@ -65,7 +65,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Semantic Release
         id: version
-        uses: cycjimmy/semantic-release-action@v3.2.0
+        uses: cycjimmy/semantic-release-action@v4.1.1
         with:
           semantic_version: 19
           extra_plugins: |
@@ -120,7 +120,7 @@ jobs:
       - name: Semantic Release
         if: github.event_name != 'pull_request'
         id: release_version
-        uses: cycjimmy/semantic-release-action@v3.2.0
+        uses: cycjimmy/semantic-release-action@v4.1.1
         with:
           semantic_version: 19
           extra_plugins: |
