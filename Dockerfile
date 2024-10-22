@@ -1,4 +1,4 @@
-ARG logscale_version=1.70.0 
+ARG logscale_version=1.161.0 
 FROM --platform=linux/amd64 humio/humio-core:${logscale_version} AS binaries
 
 FROM ghcr.io/logscale-contrib/image-logscale-azul-19-base/container:1.0.3
